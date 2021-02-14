@@ -42,6 +42,10 @@
 
 #include <mutex>
 #include <unordered_set>
+// for pointcloud mapping and viewing
+#include "pointcloudmapping.h"
+
+class PointCloudMapping;
 
 namespace ORB_SLAM3
 {
@@ -57,7 +61,7 @@ class Tracking
 {  
 
 public:
-    Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Atlas* pAtlas,
+    Tracking(System* pSys, ORBVocabulary* pVoc, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Atlas* pAtlas, shared_ptr<PointCloudMapping> pPointCloud,
              KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor, const string &_nameSeq=std::string());
 
     ~Tracking();
@@ -124,7 +128,7 @@ public:
     Frame mLastFrame;
 
     cv::Mat mImGray;
-
+    cv::Mat mImDepth; // adding mImDepth member to realize pointcloud view
     // Initialization Variables (Monocular)
     std::vector<int> mvIniLastMatches;
     std::vector<int> mvIniMatches;
@@ -309,6 +313,8 @@ protected:
     bool mbRGB;
 
     list<MapPoint*> mlpTemporalPoints;
+     // for point cloud viewing
+    shared_ptr<PointCloudMapping> mpPointCloudMapping;
 
     //int nMapChangeIndex;
 
