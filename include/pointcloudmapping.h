@@ -27,7 +27,7 @@
 #include <pcl/filters/voxel_grid.h>
 #include <condition_variable>
 
-using namespace ORB_SLAM2;
+using namespace ORB_SLAM3;
 
 class PointCloudMapping
 {
