@@ -25,13 +25,15 @@
 #include "Atlas.h"
 #include "ORBVocabulary.h"
 #include "Tracking.h"
-
+#include "pointcloudmapping.h"
 #include "KeyFrameDatabase.h"
 
 #include <boost/algorithm/string.hpp>
 #include <thread>
 #include <mutex>
 #include "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
+
+class PointCloudMapping;
 
 namespace ORB_SLAM3
 {
@@ -52,7 +54,7 @@ public:
 
 public:
 
-    LoopClosing(Atlas* pAtlas, KeyFrameDatabase* pDB, ORBVocabulary* pVoc,const bool bFixScale);
+    LoopClosing(Atlas* pAtlas, KeyFrameDatabase* pDB, ORBVocabulary* pVoc,const bool bFixScale, shared_ptr<PointCloudMapping> pPointCloud);
 
     void SetTracker(Tracking* pTracker);
 
@@ -68,6 +70,7 @@ public:
 
     // This function will run in a separate thread
     void RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoopKF);
+    shared_ptr<PointCloudMapping>  mpPointCloudMapping;
 
     bool isRunningGBA(){
         unique_lock<std::mutex> lock(mMutexGBA);
@@ -81,6 +84,9 @@ public:
     void RequestFinish();
 
     bool isFinished();
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW	
+    int loopcount = 0;
 
     Viewer* mpViewer;
 
@@ -201,6 +207,7 @@ protected:
     vector<double> vdPR_CurrentTime;
     vector<double> vdPR_MatchedTime;
     vector<int> vnPR_TypeRecogn;
+    bool mnFullBAIdx;
 };
 
 } //namespace ORB_SLAM
