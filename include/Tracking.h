@@ -126,7 +126,7 @@ public:
     // Current Frame
     Frame mCurrentFrame;
     Frame mLastFrame;
-
+    cv::Mat mImRGB;
     cv::Mat mImGray;
     cv::Mat mImDepth; // adding mImDepth member to realize pointcloud view
     // Initialization Variables (Monocular)
