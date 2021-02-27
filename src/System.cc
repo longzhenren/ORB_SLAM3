@@ -204,7 +204,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     //Initialize the Loop Closing thread and launch
     // mSensor!=MONOCULAR && mSensor!=IMU_MONOCULAR
-    mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR); // mSensor!=MONOCULAR);
+    mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR,mpPointCloudMapping); // mSensor!=MONOCULAR);
     mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
     //Initialize the Viewer thread and launch
@@ -486,7 +486,7 @@ void System::Shutdown()
     }
 
     if(mpViewer)
-        pangolin::BindToContext("ORB-SLAM2: Map Viewer");
+        pangolin::BindToContext("ORB-SLAM3: Map Viewer");
 }
 
 
