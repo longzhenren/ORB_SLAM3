@@ -61,7 +61,7 @@ void PointCloudMapping::insertKeyFrame(KeyFrame* kf, cv::Mat& color, cv::Mat& de
     //depthImgs.push_back( depth.clone() );
     PointCloude pointcloude;
     pointcloude.pcID = idk;
-    pointcloude.T = ORB_SLAM2::Converter::toSE3Quat( kf->GetPose() );
+    pointcloude.T = ORB_SLAM3::Converter::toSE3Quat( kf->GetPose() );
     pointcloude.pcE = generatePointCloud(kf,color,depth);
     pointcloud.push_back(pointcloude);
     keyFrameUpdated.notify_one();
@@ -91,7 +91,7 @@ pcl::PointCloud< PointCloudMapping::PointT >::Ptr PointCloudMapping::generatePoi
         }
     }
     
-    //Eigen::Isometry3d T = ORB_SLAM2::Converter::toSE3Quat( kf->GetPose() );
+    //Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat( kf->GetPose() );
     //PointCloud::Ptr cloud(new PointCloud);
     //pcl::transformPointCloud( *tmp, *cloud, T.inverse().matrix());
     //cloud->is_dense = false;
@@ -191,7 +191,7 @@ void PointCloudMapping::updatecloud()
 		    {   
 				if(pointcloud[j].pcID==currentvpKFs[i]->mnFrameId) 
 				{   
-					Eigen::Isometry3d T = ORB_SLAM2::Converter::toSE3Quat(currentvpKFs[i]->GetPose() );
+					Eigen::Isometry3d T = ORB_SLAM3::Converter::toSE3Quat(currentvpKFs[i]->GetPose() );
 					PointCloud::Ptr cloud(new PointCloud);
 					pcl::transformPointCloud( *pointcloud[j].pcE, *cloud, T.inverse().matrix());
 					*tmp1 +=*cloud;

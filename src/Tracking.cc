@@ -38,7 +38,7 @@
 #include <include/CameraModels/KannalaBrandt8.h>
 #include <include/MLPnPsolver.h>
 
-
+// int idk = 1;//?
 using namespace std;
 
 namespace ORB_SLAM3
@@ -47,8 +47,9 @@ namespace ORB_SLAM3
 
 Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Atlas *pAtlas,shared_ptr<PointCloudMapping> pPointCloud, KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor, const string &_nameSeq):
     mState(NO_IMAGES_YET), mSensor(sensor), mTrackedFr(0), mbStep(false),
-    mbOnlyTracking(false), mbMapUpdated(false), mbVO(false), mpORBVocabulary(pVoc),mpPointCloudMapping( pPointCloud ), mpKeyFrameDB(pKFDB),
-    mpInitializer(static_cast<Initializer*>(NULL)), mpSystem(pSys), mpViewer(NULL),
+    mbOnlyTracking(false), mbMapUpdated(false), mbVO(false), mpORBVocabulary(pVoc),
+    mpPointCloudMapping( pPointCloud ),
+    mpKeyFrameDB(pKFDB),mpInitializer(static_cast<Initializer*>(NULL)), mpSystem(pSys), mpViewer(NULL),
     mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpAtlas(pAtlas), mnLastRelocFrameId(0), time_recently_lost(5.0),
     mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr)
 {
@@ -1001,7 +1002,7 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
             cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
     }
 
-    if((fabs(mDepthMapFactor-1.0f)>1e-5) || mImDepth.type()!=CV_32F)
+    if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
         mImDepth.convertTo(mImDepth,CV_32F,mDepthMapFactor);
 
     std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
@@ -2905,8 +2906,11 @@ void Tracking::CreateNewKeyFrame()
     mpLocalMapper->InsertKeyFrame(pKF);
 
     mpLocalMapper->SetNotStop(false);
-// insert Key Frame into point cloud viewer
-    mpPointCloudMapping->insertKeyFrame( pKF, this->mImRGB, this->mImDepth );
+    vector<KeyFrame*> vpKFs = mpMap->GetAllKeyFrames();
+    // insert Key Frame into point cloud viewer
+    mpPointCloudMapping->insertKeyFrame( pKF, this->mImRGB, this->mImDepth  ,idk,vpKFs);
+    
+
     mnLastKeyFrameId = mCurrentFrame.mnId;
     mpLastKeyFrame = pKF;
     //cout  << "end creating new KF" << endl;

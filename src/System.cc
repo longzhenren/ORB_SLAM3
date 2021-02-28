@@ -32,11 +32,14 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
+
 #include <time.h>
+
 bool has_suffix(const std::string &str, const std::string &suffix) {
   std::size_t index = str.find(suffix, str.size() - suffix.size());
   return (index != std::string::npos);
 }
+
 namespace ORB_SLAM3
 {
 
@@ -75,31 +78,35 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
        cerr << "Failed to open settings file at: " << strSettingsFile << endl;
        exit(-1);
     }
- // for point cloud resolution
+
+    // for point cloud resolution
     float resolution = fsSettings["PointCloudMapping.Resolution"];
+    float meank = fsSettings["meank"];
+    float thresh = fsSettings["thresh"];
 
     bool loadedAtlas = false;
-
+    
     //----
     //Load ORB Vocabulary
     cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
     clock_t tStart = clock();
+
     mpVocabulary = new ORBVocabulary();
-    // bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
     bool bVocLoad = false; // chose loading method based on file extension
     if (has_suffix(strVocFile, ".txt"))
 	  bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
 	else
 	  bVocLoad = mpVocabulary->loadFromBinaryFile(strVocFile);
-    
+    // bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
     if(!bVocLoad)
     {
         cerr << "Wrong path to vocabulary. " << endl;
         cerr << "Failed to open at: " << strVocFile << endl;
         exit(-1);
     }
-    // cout << "Vocabulary loaded!" << endl << endl;
     printf("Vocabulary loaded in %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+    // cout << "Vocabulary loaded!" << endl << endl;
+
     //Create KeyFrame Database
     mpKeyFrameDatabase = new KeyFrameDatabase(*mpVocabulary);
 
@@ -181,13 +188,15 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     //Create Drawers. These are used by the Viewer
     mpFrameDrawer = new FrameDrawer(mpAtlas);
     mpMapDrawer = new MapDrawer(mpAtlas, strSettingsFile);
+
     // Initialize pointcloud mapping
-    mpPointCloudMapping = make_shared<PointCloudMapping>( resolution );
+    mpPointCloudMapping = make_shared<PointCloudMapping>( resolution,meank,thresh );
+
     //Initialize the Tracking thread
     //(it will live in the main thread of execution, the one that called this constructor)
     cout << "Seq. Name: " << strSequence << endl;
     mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
-                             mpAtlas, mpPointCloudMapping, mpKeyFrameDatabase, strSettingsFile, mSensor, strSequence);
+                             mpAtlas,mpPointCloudMapping, mpKeyFrameDatabase, strSettingsFile, mSensor, strSequence);
 
     //Initialize the Local Mapping thread and launch
     mpLocalMapper = new LocalMapping(this, mpAtlas, mSensor==MONOCULAR || mSensor==IMU_MONOCULAR, mSensor==IMU_MONOCULAR || mSensor==IMU_STEREO, strSequence);
@@ -486,7 +495,7 @@ void System::Shutdown()
     }
 
     if(mpViewer)
-        pangolin::BindToContext("ORB-SLAM3: Map Viewer");
+        pangolin::BindToContext("ORB-SLAM2: Map Viewer");
 }
 
 
@@ -1077,7 +1086,14 @@ string System::CalculateCheckSum(string filename, int type)
 
     return checksum;
 }*/
-
+void System::save()
+{
+    mpPointCloudMapping->save();
+}
+int System::getloopcount()
+{
+    return mpLoopCloser->loopcount;
+}
 } //namespace ORB_SLAM
 
 
