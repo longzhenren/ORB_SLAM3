@@ -32,9 +32,7 @@
 #include <thread>
 #include <mutex>
 #include "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
-
 class PointCloudMapping;
-
 namespace ORB_SLAM3
 {
 
@@ -71,7 +69,6 @@ public:
     // This function will run in a separate thread
     void RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoopKF);
     shared_ptr<PointCloudMapping>  mpPointCloudMapping;
-
     bool isRunningGBA(){
         unique_lock<std::mutex> lock(mMutexGBA);
         return mbRunningGBA;
@@ -85,13 +82,11 @@ public:
 
     bool isFinished();
 
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW	
-    int loopcount = 0;
-
     Viewer* mpViewer;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
+    int loopcount = 0;
+    
 protected:
 
     bool CheckNewKeyFrames();
@@ -207,7 +202,6 @@ protected:
     vector<double> vdPR_CurrentTime;
     vector<double> vdPR_MatchedTime;
     vector<int> vnPR_TypeRecogn;
-    bool mnFullBAIdx;
 };
 
 } //namespace ORB_SLAM

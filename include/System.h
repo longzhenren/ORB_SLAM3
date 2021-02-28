@@ -39,11 +39,11 @@
 #include "ORBVocabulary.h"
 #include "Viewer.h"
 #include "ImuTypes.h"
+
 // for point cloud viewing
 #include "pointcloudmapping.h"
 
 class PointCloudMapping;
-
 
 namespace ORB_SLAM3
 {
@@ -173,7 +173,10 @@ public:
     int GetTrackingState();
     std::vector<MapPoint*> GetTrackedMapPoints();
     std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
-
+    void save();
+    int getloopcount();
+    // point cloud mapping
+    shared_ptr<PointCloudMapping> mpPointCloudMapping;
     // For debugging
     double GetTimeFromIMUInit();
     bool isLost();
@@ -241,8 +244,6 @@ private:
     std::vector<MapPoint*> mTrackedMapPoints;
     std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
     std::mutex mMutexState;
-     // point cloud mapping
-    shared_ptr<PointCloudMapping> mpPointCloudMapping;
 };
 
 }// namespace ORB_SLAM
