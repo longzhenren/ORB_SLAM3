@@ -38,7 +38,7 @@
 #include <include/CameraModels/KannalaBrandt8.h>
 #include <include/MLPnPsolver.h>
 
-// int idk = 1;//?
+int idk = 1;
 using namespace std;
 
 namespace ORB_SLAM3
@@ -1002,7 +1002,7 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
             cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
     }
 
-    if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
+    if((fabs(mDepthMapFactor-1.0f)>1e-5) || mImDepth.type()!=CV_32F)
         mImDepth.convertTo(mImDepth,CV_32F,mDepthMapFactor);
 
     std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
@@ -1842,6 +1842,7 @@ void Tracking::Track()
             // Check if we need to insert a new keyframe
             if(bNeedKF && (bOK|| (mState==RECENTLY_LOST && (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO))))
                 CreateNewKeyFrame();
+                idk++;//?
 
             // We allow points with high innovation (considererd outliers by the Huber Function)
             // pass to the new keyframe, so that bundle adjustment will finally decide
@@ -2906,7 +2907,7 @@ void Tracking::CreateNewKeyFrame()
     mpLocalMapper->InsertKeyFrame(pKF);
 
     mpLocalMapper->SetNotStop(false);
-    vector<KeyFrame*> vpKFs = mpMap->GetAllKeyFrames();
+    vector<KeyFrame*> vpKFs = mpAtlas->GetAllKeyFrames();
     // insert Key Frame into point cloud viewer
     mpPointCloudMapping->insertKeyFrame( pKF, this->mImRGB, this->mImDepth  ,idk,vpKFs);
     
